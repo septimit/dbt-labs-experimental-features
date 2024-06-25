@@ -1,10 +1,10 @@
-test-databricks:
+test-teradata:
 	dbt deps
-	dbt seed --target databricks --full-refresh
-	dbt run -s test_insert_by_period --target databricks --full-refresh
+	dbt seed --target teradata --full-refresh
+	dbt run -s test_insert_by_period --target teradata --full-refresh
 	dbt test
-	dbt run -s test_insert_by_period --target databricks --vars 'test_backfill: True'
-	dbt test --target databricks
+	dbt run -s test_insert_by_period --target teradata --vars 'test_backfill: True'
+	dbt test --target teradata
 
-test-all: test-databricks
+test-all: test-teradata
 	echo "Completed successfully"

@@ -46,7 +46,7 @@
   {% if force_create or old_relation is none -%}
     {# Create an empty target table -#}
     {% call statement('main') -%}
-      {%- set empty_sql = sql | replace("__PERIOD_FILTER__", 'false') -%}
+      {%- set empty_sql = sql | replace("__PERIOD_FILTER__", '1 = 0') -%}
       {{create_table_as(False, target_relation, empty_sql)}}
     {%- endcall %}
   {%- endif %}
@@ -93,11 +93,9 @@
     {%- set name = 'main-' ~ i -%}
     {% call statement(name, fetch_result=True) -%}
       insert into {{target_relation}} ({{target_cols_csv}})
-      (
-          select
-              {{target_cols_csv}}
-          from {{tmp_relation.include(schema=True)}}
-      );
+      select {{target_cols_csv}}
+      from {{tmp_relation.include(schema=True)}}
+      ;
     {%- endcall %}
     {% set result = load_result('main-' ~ i) %}
     

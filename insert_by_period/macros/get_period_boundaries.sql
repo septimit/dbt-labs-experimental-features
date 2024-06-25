@@ -33,7 +33,7 @@
 {%- endmacro %}
 
 
-{% macro bigquery__get_period_boundaries(target_schema, target_table, timestamp_field, start_date, stop_date, period, backfill, full_refresh_mode) -%}
+{% macro teradata__get_period_boundaries(target_schema, target_table, timestamp_field, start_date, stop_date, period, backfill, full_refresh_mode) -%}
 
   {% call statement('period_boundaries', fetch_result=True) -%}
     with data as (
@@ -43,16 +43,16 @@
           {%- else -%}
           coalesce(max({{timestamp_field}}), cast('{{start_date}}' as timestamp)) as start_timestamp,
           {%- endif %}
-          coalesce(datetime_add(cast(nullif('{{stop_date}}','') as timestamp), interval -1 millisecond), {{dbt.current_timestamp()}}) as stop_timestamp
+          prior(coalesce(cast(nullif('{{stop_date}}','') as timestamp), {{ dbt.current_timestamp() }})) as stop_timestamp
       from {{adapter.quote(target_schema)}}.{{adapter.quote(target_table)}}
     )
 
     select
       start_timestamp,
       stop_timestamp,
-      {{ datediff('start_timestamp',
+      ({{ datediff('start_timestamp',
                            'stop_timestamp',
-                           period) }}  + 1 as num_periods
+                           period) }})  + INTERVAL '1' {{ period }} as num_periods
     from data
   {%- endcall %}
 

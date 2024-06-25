@@ -11,7 +11,7 @@ profile: 'integration_tests'
 
 dispatch:
  - macro_namespace: dbt_utils
-   search_order: ['spark_utils', 'dbt_utils', 'insert_by_period_integration_tests']
+   search_order: ['teradata_utils', 'dbt_utils', 'insert_by_period_integration_tests']
 
 
 model-paths: ["models"]

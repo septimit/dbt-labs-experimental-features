@@ -3,8 +3,8 @@
 		materialized = 'insert_by_period',
 		period = 'month',
 		timestamp_field = 'cast(created_at as timestamp)',
-		start_date = '2018-01-01 00:00:00.000',
-		stop_date = '2018-03-01 00:00:00.000',
+		start_date = '2018-01-01',
+		stop_date = '2018-03-01',
 		backfill = var('test_backfill', False),
 		enabled=(project_name == 'insert_by_period_integration_tests'),
 	)

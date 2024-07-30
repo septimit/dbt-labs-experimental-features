@@ -69,6 +69,7 @@
   {% set target_columns = adapter.get_columns_in_relation(target_relation) %}
   {%- set target_cols_csv = target_columns | map(attribute='quoted') | join(', ') -%}
   {%- set loop_vars = {'sum_rows_inserted': 0} -%}
+  {% set to_drop = [] %}
 
   -- commit each period as a separate transaction
   {% for i in range(num_periods) -%}
@@ -86,6 +87,7 @@
                                                        stop_timestamp,
                                                        i) %}
       {{dbt.create_table_as(True, tmp_relation, tmp_table_sql)}}
+      {% do to_drop.append(tmp_relation) %}
     {%- endcall %}
 
     {{adapter.expand_target_column_types(from_relation=tmp_relation,
@@ -121,6 +123,10 @@
 
   -- `COMMIT` happens here
   {{ adapter.commit() }}
+
+  {% for rel in to_drop %}
+     {% do adapter.drop_relation(rel) %}
+  {% endfor %}
 
   {{ run_hooks(post_hooks, inside_transaction=False) }}
   -- end from the table mat
